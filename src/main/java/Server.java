@@ -12,6 +12,7 @@ public class Server {
     private static ServerSocket server;
     private static OutputStreamWriter writer;
     private static BufferedReader reader;
+    private static BufferedReader consoleReader;
 
     public static void main(String[] args) {
         try {
@@ -24,34 +25,43 @@ public class Server {
                     System.out.println("Player 2 connected.");
                 }
                 try {
-                    System.out.print("Your warriors : [");
-                    int[] warriors = GameService.getWarriors();
-                    for (int i = 0; i < warriors.length; i++) {
-                        if (i == warriors.length - 1) {
-                            System.out.print(warriors[i] + "]\n");
-                            continue;
-                        }
-                        System.out.print(warriors[i] + ",");
-                    }
-
                     writer = new OutputStreamWriter(clientSocket.getOutputStream(), StandardCharsets.UTF_8);
                     reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
+                    consoleReader = new BufferedReader(new InputStreamReader(System.in));
 
                     String message = "";
                     message = reader.readLine();
-                        if (message.contains("start")) {
-                            int[] clientsWarriors = GameService.getWarriors();
-                            JSONArray jsonArray = new JSONArray(clientsWarriors);
-                            writer.write(jsonArray.toString() + "\n");
-                            writer.flush();
+                    if (message.contains("start")) {
+                        System.out.println("Message from player 2: start");
+                        System.out.println("\n_______________________________________________________________________" +
+                                "\nThe GAME has started!");
+                        System.out.print("Your warriors : [");
+                        int[] warriors = GameService.getWarriors();
+                        for (int i = 0; i < warriors.length; i++) {
+                            if (i == warriors.length - 1) {
+                                System.out.print(warriors[i] + "]\n");
+                                continue;
+                            }
+                            System.out.print(warriors[i] + ",");
                         }
 
-                        System.out.println("Message from player 2: " + message);
+                        int[] clientsWarriors = GameService.getWarriors();
+                        JSONArray jsonArray = new JSONArray(clientsWarriors);
+                        writer.write(jsonArray.toString() + "\n");
+                        writer.flush();
 
-                        if (message.contains("exit")) {
-                            System.out.println("Player 1 win!");
+                        System.out.println("Enter your turn (using spaces AND list of warriors) :");
+                        String serverTurn = consoleReader.readLine();
+                        int[] serverArr = GameService.parseString(serverTurn);
+
+                        if (!GameService.isTurnCorrect(new JSONArray(warriors), serverArr)) {
+
                         }
 
+                    } else if (message.contains("exit")) {
+                        System.out.println("Message from player 2: exit");
+                        System.out.println("Player 1 win!");
+                    }
                 } finally {
                     clientSocket.close();
                     System.out.println("Client disconnected");

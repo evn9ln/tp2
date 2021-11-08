@@ -4,6 +4,7 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class Client {
     private static Socket clientSocket;
@@ -23,27 +24,34 @@ public class Client {
                 writer = new OutputStreamWriter(clientSocket.getOutputStream(), StandardCharsets.UTF_8);
                 reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
 
-                while (true) {
-                    String word = "";
-                    while (!word.contains("start") && !word.contains("exit")) {
-                        System.out.println("Enter 'start' to start game (or exit to end the game) :");
-                        word = consoleReader.readLine();
-                    }
+                String word = "";
+                while (!word.contains("start") && !word.contains("exit")) {
+                    System.out.println("Enter 'start' to start game (or exit to end the game) :");
+                    word = consoleReader.readLine();
+                }
 
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("message", word);
-                    writer.write(jsonObject.toString() + "\n");
-                    writer.flush();
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("message", word);
+                writer.write(jsonObject.toString() + "\n");
+                writer.flush();
 
-                    if (word.equals("exit")) {
-                        break;
-                    }
-
+                if (word.equals("exit")) {
+                    System.out.println("Game over!");
+                } else {
                     String line = reader.readLine();
                     JSONArray jsonArray = new JSONArray(line);
-                    System.out.println("Receiver from server : " + jsonArray.toString());
+                    System.out.println("Your warriors : " + jsonArray.toString());
 
+                    System.out.println("Enter your turn (using spaces AND list of warriors) : ");
+                    String clientTurn = consoleReader.readLine();
+                    int[] clientArr = GameService.parseString(clientTurn);
+                    //System.out.println(Arrays.toString(clientArr));
+
+                    if (!GameService.isTurnCorrect(jsonArray, clientArr)) {
+
+                    }
                 }
+
             } finally {
                 System.out.println("Client closed.");
                 if (clientSocket != null) {
@@ -57,7 +65,6 @@ public class Client {
             e.printStackTrace();
         }
     }
-
 }
 
 

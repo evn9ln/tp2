@@ -1,3 +1,5 @@
+import org.json.JSONArray;
+
 public class GameService {
 
     public static int[] getWarriors() {
@@ -7,4 +9,23 @@ public class GameService {
         }
         return warriors;
     }
+
+    public static int[] parseString(String arr) {
+        String[] items = arr.split(" ");
+        int[] result = new int[items.length];
+
+        for (int i = 0; i < items.length; i++) {
+            try {
+                result[i] = Integer.parseInt(items[i].trim());
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+    public static boolean isTurnCorrect(JSONArray jsonArray, int[] turn) {
+        return false;
+    }
+
 }
