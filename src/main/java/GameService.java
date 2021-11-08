@@ -11,7 +11,7 @@ public class GameService {
     }
 
     public static int[] parseString(String arr) {
-        String[] items = arr.split(" ");
+        String[] items = arr.trim().split(" ");
         int[] result = new int[items.length];
 
         for (int i = 0; i < items.length; i++) {
