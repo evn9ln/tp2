@@ -47,9 +47,16 @@ public class Client {
                     int[] clientArr = GameService.parseString(clientTurn);
                     //System.out.println(Arrays.toString(clientArr));
 
-                    if (!GameService.isTurnCorrect(jsonArray, clientArr)) {
-
+                    while(!GameService.isTurnCorrect(jsonArray, clientArr)) {
+                        clientTurn=consoleReader.readLine();
+                        clientArr = GameService.parseString(clientTurn);
                     }
+                    jsonObject.clear();
+                    jsonObject.put("clientTurn",clientTurn);
+                    writer.write(jsonObject.toString() + "\n");
+                    writer.flush();
+                    jsonObject = new JSONObject(reader.readLine());
+                    System.out.println(jsonObject.get("winner"));
                 }
 
             } finally {

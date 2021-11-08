@@ -54,10 +54,19 @@ public class Server {
                         String serverTurn = consoleReader.readLine();
                         int[] serverArr = GameService.parseString(serverTurn);
 
-                        if (!GameService.isTurnCorrect(new JSONArray(warriors), serverArr)) {
-
+                        while (!GameService.isTurnCorrect(new JSONArray(warriors), serverArr)) {
+                            serverTurn=consoleReader.readLine();
+                            serverArr = GameService.parseString(serverTurn);
                         }
-
+                        String clientTurn = reader.readLine();
+                        JSONObject jsonObjectClient=new JSONObject(clientTurn);
+                        clientTurn = (String) jsonObjectClient.get("clientTurn");
+                        int[] clientArr = GameService.parseString(clientTurn);
+                        System.out.println(GameService.getWinner(clientArr,serverArr));
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("winner",GameService.getWinner(clientArr,serverArr));
+                        writer.write(jsonObject.toString()+"\n");
+                        writer.flush();
                     } else if (message.contains("exit")) {
                         System.out.println("Message from player 2: exit");
                         System.out.println("Player 1 win!");
