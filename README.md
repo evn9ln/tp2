@@ -12,6 +12,7 @@
 Общение между клиентом и сервером производится по сокету с передачей json, выбранная реализация json - https://stleary.github.io/JSON-java/index.html
 
 ## Пример работы программы
-![](https://github.com/evn9ln/tp2/blob/master/1.gif)
 
-![](https://github.com/evn9ln/tp2/blob/master/2.gif)
+![](https://media.giphy.com/media/XW9IlB2xiSvQ8Msdc5/giphy.gif)
+
+![](https://media.giphy.com/media/Ki9QgIYNv2nRSDdUl1/giphy.gif)
