@@ -2,9 +2,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.net.ConnectException;
 import java.net.ServerSocket;
 
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 
 public class Server {
@@ -50,22 +52,32 @@ public class Server {
                         writer.write(jsonArray.toString() + "\n");
                         writer.flush();
 
-                        System.out.println("Enter your turn (using spaces AND list of warriors) :");
-                        String serverTurn = consoleReader.readLine();
-                        int[] serverArr = GameService.parseString(serverTurn);
-
-                        while (!GameService.isTurnCorrect(new JSONArray(warriors), serverArr)) {
-                            serverTurn=consoleReader.readLine();
-                            serverArr = GameService.parseString(serverTurn);
+                        String serverTurn;
+                        int[] serverArr;
+                        while (true) {
+                            System.out.println("Enter your turn (using spaces AND list of warriors, " +
+                                    "for example:1 2 3 4 5) : ");
+                            serverTurn = consoleReader.readLine();
+                            try {
+                                serverArr = GameService.parseString(serverTurn);
+                                if (GameService.isTurnCorrect(new JSONArray(warriors), serverArr)) {
+                                    break;
+                                } else {
+                                    System.out.println("Incorrect turn! Try again...");
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println("Incorrect input (use only numbers and 'space' on your keyboard!");
+                            }
                         }
+                        System.out.println("Waiting for Player 2 turn...");
                         String clientTurn = reader.readLine();
-                        JSONObject jsonObjectClient=new JSONObject(clientTurn);
+                        JSONObject jsonObjectClient = new JSONObject(clientTurn);
                         clientTurn = (String) jsonObjectClient.get("clientTurn");
                         int[] clientArr = GameService.parseString(clientTurn);
-                        System.out.println(GameService.getWinner(clientArr,serverArr));
+                        System.out.println(GameService.getWinner(clientArr, serverArr));
                         JSONObject jsonObject = new JSONObject();
-                        jsonObject.put("winner",GameService.getWinner(clientArr,serverArr));
-                        writer.write(jsonObject.toString()+"\n");
+                        jsonObject.put("winner", GameService.getWinner(clientArr, serverArr));
+                        writer.write(jsonObject.toString() + "\n");
                         writer.flush();
                     } else if (message.contains("exit")) {
                         System.out.println("Message from player 2: exit");
@@ -75,6 +87,8 @@ public class Server {
                     clientSocket.close();
                     System.out.println("Client disconnected");
                 }
+            } catch (SocketException socketException) {
+                System.out.println("Something went wrong with client connection. Restart game");
             } finally {
                 System.out.println("Server closed");
                 server.close();
@@ -82,7 +96,7 @@ public class Server {
                 reader.close();
             }
         } catch (IOException e) {
-            System.err.println(e);
+            System.err.println("Something went wrong. Restart game");
         }
     }
 }

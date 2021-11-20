@@ -13,21 +13,20 @@ public class GameService {
         return warriors;
     }
 
-    public static int[] parseString(String arr) {
+    public static int[] parseString(String arr) throws NumberFormatException{
         String[] items = arr.trim().split(" ");
         int[] result = new int[items.length];
 
         for (int i = 0; i < items.length; i++) {
-            try {
-                result[i] = Integer.parseInt(items[i].trim());
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            }
+            result[i] = Integer.parseInt(items[i].trim());
         }
         return result;
     }
 
     public static boolean isTurnCorrect(JSONArray jsonArray, int[] turn) {
+        if (jsonArray.toList().size() != turn.length) {
+            return false;
+        }
         List<Integer> arr1 = new ArrayList<>();
         List<Integer> arr2 = Arrays.stream(turn).boxed().collect(Collectors.toList());
         jsonArray.forEach(js->arr1.add((Integer)js));
