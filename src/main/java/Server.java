@@ -78,8 +78,11 @@ public class Server {
                         Marshaller marshaller2 = jaxbContext.createMarshaller();
                         marshaller2.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
                         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+                        Unmarshaller unmarshaller2 = jaxbContext.createUnmarshaller();
                         marshaller.setSchema(schema);
+                        marshaller2.setSchema(schema);
                         unmarshaller.setSchema(schema);
+                        unmarshaller2.setSchema(schema);
 
                         marshaller.marshal(new ArrayOfWarriors( Arrays.stream(clientsWarriors)
                                 .boxed()
