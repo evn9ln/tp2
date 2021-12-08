@@ -45,7 +45,7 @@ public class Client {
                     System.out.println("Enter your turn (using spaces AND list of warriors) : ");
                     String clientTurn = consoleReader.readLine();
                     int[] clientArr = GameService.parseString(clientTurn);
-                    //System.out.println(Arrays.toString(clientArr));
+                    System.out.println(Arrays.toString(clientArr));
 
                     while(!GameService.isTurnCorrect(jsonArray, clientArr)) {
                         clientTurn=consoleReader.readLine();
