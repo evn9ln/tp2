@@ -50,7 +50,6 @@ public class Client {
                     System.out.println("Enter your turn (using spaces AND list of warriors) : ");
                     String clientTurn = consoleReader.readLine();
                     int[] clientArr = GameService.parseString(clientTurn);
-                    System.out.println(Arrays.toString(clientArr));
 
                     while(!GameService.isTurnCorrect(jsonArray, clientArr)) {
                         clientTurn=consoleReader.readLine();
@@ -64,14 +63,19 @@ public class Client {
                     System.out.println(jsonObject.get("winner"));
 
                     File stateFileClient = new File("state.xml");
+                    File stateFileServer = new File("state2.xml");
                     JAXBContext jaxbContext = JAXBContext.newInstance(ArrayOfWarriors.class);
                     SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
                     Schema schema = schemaFactory.newSchema(new File("schema1.xsd"));
                     Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+                    Unmarshaller unmarshaller2 = jaxbContext.createUnmarshaller();
                     unmarshaller.setSchema(schema);
+                    unmarshaller2.setSchema(schema);
 
                     ArrayOfWarriors clientStartArray = (ArrayOfWarriors) unmarshaller.unmarshal(stateFileClient);
                     System.out.println(clientStartArray.toString());
+                    ArrayOfWarriors serverStartArray = (ArrayOfWarriors) unmarshaller.unmarshal(stateFileServer);
+                    System.out.println(serverStartArray.toString());
                 }
 
             } finally {

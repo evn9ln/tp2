@@ -108,6 +108,9 @@ public class Server {
                         ArrayOfWarriors serverStartArray = (ArrayOfWarriors) unmarshaller.unmarshal(stateFileServer);
                         System.out.println(serverStartArray.toString());
 
+                        ArrayOfWarriors clientStartArray = (ArrayOfWarriors) unmarshaller.unmarshal(stateFileClient);
+                        System.out.println(clientStartArray.toString());
+
                         writer.write(jsonObject.toString() + "\n");
                         writer.flush();
                     } else if (message.contains("exit")) {
