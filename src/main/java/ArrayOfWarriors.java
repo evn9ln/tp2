@@ -21,4 +21,9 @@ public class ArrayOfWarriors {
         this.array = array;
         this.msg = msg;
     }
+
+    @Override
+    public String toString() {
+        return "\n" + msg + "\n" + array + "\n";
+    }
 }

@@ -21,7 +21,8 @@ public class Server {
     private static OutputStreamWriter writer;
     private static BufferedReader reader;
     private static BufferedReader consoleReader;
-    private static File stateFile;
+    private static File stateFileClient;
+    private static File stateFileServer;
 
     public static void main(String[] args) {
         try {
@@ -65,26 +66,32 @@ public class Server {
                         String serverTurn = consoleReader.readLine();
                         int[] serverArr = GameService.parseString(serverTurn);
 
-                        stateFile = new File("state.xml");
+                        stateFileClient = new File("state.xml");
                         JAXBContext jaxbContext = JAXBContext.newInstance(ArrayOfWarriors.class);
                         SchemaOutputResolver sor = new MySchemaOutputResolver();
                         jaxbContext.generateSchema(sor);
-                        sor.createOutput("src/main/resources", "schema.xsd");
+                        sor.createOutput("src/main/resources", "schema1.xsd");
                         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                        Schema schema = schemaFactory.newSchema(new File("src/main/resources/schema.xsd"));
+                        Schema schema = schemaFactory.newSchema(new File("schema1.xsd"));
                         Marshaller marshaller = jaxbContext.createMarshaller();
+                        Marshaller marshaller2 = jaxbContext.createMarshaller();
                         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+                        marshaller2.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
                         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+                        Unmarshaller unmarshaller2 = jaxbContext.createUnmarshaller();
                         marshaller.setSchema(schema);
+                        marshaller2.setSchema(schema);
                         unmarshaller.setSchema(schema);
+                        unmarshaller2.setSchema(schema);
 
 
                         marshaller.marshal(new ArrayOfWarriors(Arrays.stream(clientsWarriors)
                                 .boxed()
-                                .collect(Collectors.toList()), "ClientStartWarriors"), stateFile);
-//                        marshaller2.marshal(new ArrayOfWarriors( Arrays.stream(warriors)
-//                                .boxed()
-//                                .collect(Collectors.toList()), "ServerStartWarriors"), stateFile);
+                                .collect(Collectors.toList()), "Client Start Warriors"), stateFileClient);
+                        stateFileServer = new File("state2.xml");
+                        marshaller2.marshal(new ArrayOfWarriors( Arrays.stream(warriors)
+                               .boxed()
+                               .collect(Collectors.toList()), "Server Start Warriors"), stateFileServer);
 
                         while (!GameService.isTurnCorrect(new JSONArray(warriors), serverArr)) {
                             serverTurn = consoleReader.readLine();
@@ -97,6 +104,10 @@ public class Server {
                         System.out.println(GameService.getWinner(clientArr, serverArr));
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put("winner", GameService.getWinner(clientArr, serverArr));
+
+                        ArrayOfWarriors serverStartArray = (ArrayOfWarriors) unmarshaller.unmarshal(stateFileServer);
+                        System.out.println(serverStartArray.toString());
+
                         writer.write(jsonObject.toString() + "\n");
                         writer.flush();
                     } else if (message.contains("exit")) {

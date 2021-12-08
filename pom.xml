@@ -37,7 +37,7 @@
                                         <transformSchema>
                                             <uri>/resources</uri>
                                             <toPrefix>arrayOfWarriors</toPrefix>
-                                            <toFile>schema.xsd</toFile>
+                                            <toFile>schema1.xsd</toFile>
                                         </transformSchema>
                                     </transformSchemas>
                                 </configuration>

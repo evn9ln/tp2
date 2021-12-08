@@ -1,6 +1,11 @@
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
+import javax.xml.bind.*;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -57,6 +62,16 @@ public class Client {
                     writer.flush();
                     jsonObject = new JSONObject(reader.readLine());
                     System.out.println(jsonObject.get("winner"));
+
+                    File stateFileClient = new File("state.xml");
+                    JAXBContext jaxbContext = JAXBContext.newInstance(ArrayOfWarriors.class);
+                    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                    Schema schema = schemaFactory.newSchema(new File("schema1.xsd"));
+                    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+                    unmarshaller.setSchema(schema);
+
+                    ArrayOfWarriors clientStartArray = (ArrayOfWarriors) unmarshaller.unmarshal(stateFileClient);
+                    System.out.println(clientStartArray.toString());
                 }
 
             } finally {
@@ -68,7 +83,7 @@ public class Client {
                     writer.close();
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | JAXBException | SAXException e) {
             e.printStackTrace();
         }
     }
