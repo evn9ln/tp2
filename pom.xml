@@ -13,29 +13,41 @@
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>2.3.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>schemagen</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>src/main/resources/</outputDirectory>
-                            <sources>
-                                <source>src/main/java/ArrayOfWarriors.java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+    <profiles>
+        <profile>
+            <id>generate_xsd</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>jaxb2-maven-plugin</artifactId>
+                        <version>2.3.1</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>schemagen</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>src/main/resources/</outputDirectory>
+                                    <sources>
+                                        <source>src/main/java/ArrayOfWarriors.java</source>
+                                    </sources>
+                                    <clearOutputDir>false</clearOutputDir>
+                                    <transformSchemas>
+                                        <transformSchema>
+                                            <uri>/resources</uri>
+                                            <toPrefix>arrayOfWarriors</toPrefix>
+                                            <toFile>schema.xsd</toFile>
+                                        </transformSchema>
+                                    </transformSchemas>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>

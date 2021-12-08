@@ -3,8 +3,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.List;
 
-@XmlRootElement
+
 @XmlType(name = "ArraysOfWarriors")
+@XmlRootElement
 public class ArrayOfWarriors {
 
     @XmlElement(name = "array", required = true)

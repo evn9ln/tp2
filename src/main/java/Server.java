@@ -3,20 +3,16 @@ import org.json.JSONObject;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.*;
+import javax.xml.transform.Result;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.*;
 import java.net.ServerSocket;
-
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.stream.Collectors;
 
 public class Server {
@@ -70,39 +66,38 @@ public class Server {
                         int[] serverArr = GameService.parseString(serverTurn);
 
                         stateFile = new File("state.xml");
+                        JAXBContext jaxbContext = JAXBContext.newInstance(ArrayOfWarriors.class);
+                        SchemaOutputResolver sor = new MySchemaOutputResolver();
+                        jaxbContext.generateSchema(sor);
+                        sor.createOutput("src/main/resources", "schema.xsd");
                         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
                         Schema schema = schemaFactory.newSchema(new File("src/main/resources/schema.xsd"));
-                        JAXBContext jaxbContext = JAXBContext.newInstance(ArrayOfWarriors.class);
                         Marshaller marshaller = jaxbContext.createMarshaller();
                         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-                        Marshaller marshaller2 = jaxbContext.createMarshaller();
-                        marshaller2.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
                         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-                        Unmarshaller unmarshaller2 = jaxbContext.createUnmarshaller();
                         marshaller.setSchema(schema);
-                        marshaller2.setSchema(schema);
                         unmarshaller.setSchema(schema);
-                        unmarshaller2.setSchema(schema);
 
-                        marshaller.marshal(new ArrayOfWarriors( Arrays.stream(clientsWarriors)
+
+                        marshaller.marshal(new ArrayOfWarriors(Arrays.stream(clientsWarriors)
                                 .boxed()
                                 .collect(Collectors.toList()), "ClientStartWarriors"), stateFile);
-                        marshaller2.marshal(new ArrayOfWarriors( Arrays.stream(serverArr)
-                                .boxed()
-                                .collect(Collectors.toList()), "ServerStartWarriors"), stateFile);
+//                        marshaller2.marshal(new ArrayOfWarriors( Arrays.stream(warriors)
+//                                .boxed()
+//                                .collect(Collectors.toList()), "ServerStartWarriors"), stateFile);
 
                         while (!GameService.isTurnCorrect(new JSONArray(warriors), serverArr)) {
-                            serverTurn=consoleReader.readLine();
+                            serverTurn = consoleReader.readLine();
                             serverArr = GameService.parseString(serverTurn);
                         }
                         String clientTurn = reader.readLine();
-                        JSONObject jsonObjectClient=new JSONObject(clientTurn);
+                        JSONObject jsonObjectClient = new JSONObject(clientTurn);
                         clientTurn = (String) jsonObjectClient.get("clientTurn");
                         int[] clientArr = GameService.parseString(clientTurn);
-                        System.out.println(GameService.getWinner(clientArr,serverArr));
+                        System.out.println(GameService.getWinner(clientArr, serverArr));
                         JSONObject jsonObject = new JSONObject();
-                        jsonObject.put("winner",GameService.getWinner(clientArr,serverArr));
-                        writer.write(jsonObject.toString()+"\n");
+                        jsonObject.put("winner", GameService.getWinner(clientArr, serverArr));
+                        writer.write(jsonObject.toString() + "\n");
                         writer.flush();
                     } else if (message.contains("exit")) {
                         System.out.println("Message from player 2: exit");
@@ -121,5 +116,16 @@ public class Server {
         } catch (IOException | SAXException | JAXBException e) {
             System.err.println(e);
         }
+    }
+
+    public static class MySchemaOutputResolver extends SchemaOutputResolver {
+
+        public Result createOutput(String namespaceURI, String suggestedFileName) throws IOException {
+            File file = new File(suggestedFileName);
+            StreamResult result = new StreamResult(file);
+            result.setSystemId(file.toURI().toURL().toString());
+            return result;
+        }
+
     }
 }
